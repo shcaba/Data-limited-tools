@@ -1,0 +1,140 @@
+library(shiny)
+library(shinyFiles)
+library(DLMtool)
+
+
+shinyUI(fluidPage(
+  titlePanel("Applying the DLMtool"),
+  sidebarLayout(
+   sidebarPanel(
+    fileInput('file1', 'Choose DLM input file',
+              accept = c(
+                'text/csv',
+                'text/comma-separated-values',
+                'text/tab-separated-values',
+                'text/plain',
+                '.csv','tmp'
+              )
+    ),
+  conditionalPanel(
+    condition="input.conditionedPanels==3",wellPanel(uiOutput("choicelist")),
+    actionButton("selectall","Select All"), 
+    actionButton("run_dlm","Run catch estimates",icon("play-circle"),style="font-size:110%;border:2px solid;background:#ffffcc")
+  ),
+
+conditionalPanel(
+  condition="input.conditionedPanels==4",wellPanel(uiOutput("sensilist"))
+),
+
+
+  conditionalPanel(
+    condition="input.conditionedPanels==5",
+    h3("Select control methods to test in MSE"), 
+    fluidRow(column(6,wellPanel(uiOutput("can.list.output"))),column(6,wellPanel(uiOutput("can.list.input")))),
+    fluidRow(column(6,actionButton("allselect","Select All output methods")),column(6,actionButton("selectinput","Select all input methods"))),
+    br(),
+    br(),
+    fluidRow(column(6,wellPanel(uiOutput("cant.list.output"))),column(6,wellPanel(uiOutput("cant.list.input")))),
+    fluidRow(column(6,actionButton("allselectNAop","Select All output methods")),column(6,actionButton("allselectNAip","Select all input methods"))),
+    
+    br(),
+    
+    h3("Build the Operating Model"), 
+    
+    wellPanel(fluidRow(column(12, uiOutput("stock.choicelist"))),
+    h4("User modifications"), 
+    fluidRow(column(6, uiOutput("stock.maxage"))),
+    fluidRow(column(4, uiOutput("stock.M")),column(4, uiOutput("stock.Msd")),column(4, uiOutput("stock.Mgrad"))),
+    fluidRow(column(4, uiOutput("stock.Linf")),column(4, uiOutput("stock.Linfsd")),column(4, uiOutput("stock.Linfgrad"))),
+    fluidRow(column(4, uiOutput("stock.K")),column(4, uiOutput("stock.Ksd")),column(4, uiOutput("stock.Kgrad"))),
+    fluidRow(column(6, uiOutput("stock.t0"))),
+    fluidRow(column(6, uiOutput("stock.WtLt_a")),column(6, uiOutput("stock.WtLt_b"))),
+    fluidRow(column(6, uiOutput("stock.R0")),column(6, uiOutput("stock.SRrel"))),
+    fluidRow(column(6, uiOutput("stock.h")),column(6, uiOutput("stock.recgrad"))),
+    fluidRow(column(6, uiOutput("stock.Perr")),column(6, uiOutput("stock.AC"))),
+    fluidRow(column(6, uiOutput("stock.L50")),column(6, uiOutput("stock.L50_95"))),
+    fluidRow(column(6, uiOutput("stock.Size_area")),column(6, uiOutput("stock.Frac_area"))),
+    fluidRow(column(6, uiOutput("stock.Prob_staying")),column(6, uiOutput("stock.D")))
+    ),
+
+    wellPanel(fluidRow(column(12, uiOutput("fleet.choicelist"))),
+    h4("User modifications"), 
+    fluidRow(column(6, uiOutput("fleet.nyrs")),column(6, uiOutput("fleet.spattarg"))),
+    fluidRow(column(6, uiOutput("fleet.L5")),column(6, uiOutput("fleet.LFS"))),
+    fluidRow(column(6, uiOutput("fleet.Vmaxlen")),column(6, uiOutput("fleet.Fsd"))),
+    fluidRow(column(6, uiOutput("fleet.qinc")),column(6, uiOutput("fleet.qcv")))),
+    
+    wellPanel(fluidRow(column(12, uiOutput("obs.choicelist"))),
+    h4("User modifications"), 
+    h5(em("Bias and error entries in lognormal std. dev.")), 
+    fluidRow(column(6, uiOutput("Obs.rcv")),column(6, uiOutput("Obs.maxagecv"))),
+    fluidRow(column(6, uiOutput("Obs.Mcv")),column(6, uiOutput("Obs.hcv"))),
+    fluidRow(column(6, uiOutput("Obs.Linfcv")),column(6, uiOutput("Obs.Kcv"))),
+    fluidRow(column(6, uiOutput("Obs.t0cv")),column(6, uiOutput("Obs.LenMcv"))),
+    fluidRow(column(6, uiOutput("Obs.Reccv")),column(6, uiOutput("Obs.FMSYcv"))),
+    fluidRow(column(6, uiOutput("Obs.FMSY_Mcv")),column(6, uiOutput("Obs.BMSY_B0cv"))),
+    fluidRow(column(6, uiOutput("Obs.Fcurbiascv")),column(6, uiOutput("Obs.Fcurcv"))),
+    fluidRow(column(6, uiOutput("Obs.LFCcv")),column(6, uiOutput("Obs.LFScv"))),
+    fluidRow(column(6, uiOutput("Obs.Cobs")),column(6, uiOutput("Obs.Cbiascv"))),
+    fluidRow(column(6, uiOutput("Obs.CAA_nsamp")),column(6, uiOutput("Obs.CAA_ESS"))),
+    fluidRow(column(6, uiOutput("Obs.CAL_nsamp")),column(6, uiOutput("Obs.CAL_ESS"))),
+    fluidRow(column(6, uiOutput("Obs.CALcv")),column(6, uiOutput("Obs.beta"))),
+    fluidRow(column(6, uiOutput("Obs.Iobs")),column(6, uiOutput("Obs.Icv"))),
+    fluidRow(column(6, uiOutput("Obs.Dbiascv")),column(6, uiOutput("Obs.Dcv"))),
+    fluidRow(column(6, uiOutput("Obs.B0cv")),column(6, uiOutput("Obs.Btcv"))),
+    fluidRow(column(6, uiOutput("Obs.Btbias")),column(6, uiOutput("Obs.Irefcv"))),
+    fluidRow(column(6, uiOutput("Obs.Brefcv")),column(6, uiOutput("Obs.Crefcv")))),
+    #Get MSE specifications
+    wellPanel(h4("MSE specifications"), 
+    fluidRow(column(6,numericInput("Projyears", "# of projection years", value=20,min=1, max=1000, step=1)),column(6,numericInput("MSE_intervals", "Intervals of method application", value=5,min=1, max=200, step=1))),
+    fluidRow(column(6,numericInput("numsims", "# of simulations", value=10,min=1, max=1000, step=1)),column(6, numericInput("reps", "Repetitions", value=1,min=1, max=100, step=1)))
+    ),
+    tags$head(tags$style(HTML('#run{background-color:orange}'))),
+    actionButton("run_dlm_MSE",strong("Run MSE"),width="100%" ,icon("play-circle"),style="font-size:120%;border:2px solid;background:#ccffcc")
+    )
+#End of sidebarPanel
+   ),
+   #
+   #   checkboxGroupInput("checkGroup",label=h3("Available methods"),choices="Methods"=1,selected=1),
+    
+    mainPanel(
+      tabsetPanel(
+        tabPanel(
+          "Checking inputs",
+          column(6,plotOutput("Catchplot")),
+          column(6,plotOutput("Indexplot")),
+          column(6,plotOutput("LHplots")),
+          column(6,plotOutput("Parameterplots")),value=1
+        ),
+        tabPanel(
+          "Unavailable methods", verbatimTextOutput("MP_NA"), value =2
+        ),
+        tabPanel(
+        "TAC estimators",plotOutput("TACplots"),plotOutput("wtedTAC"),
+        downloadButton('downloadTAC', 'Download TAC values'),
+        downloadButton('downloadTACobj', 'Download TAC R object'),
+        value=3
+        ),
+        tabPanel(
+          "TAC sensitivities",column(12,plotOutput("Sensiplot",height = 800, width = 1000)),
+          column(2,downloadButton('downloadSensi', 'Download plots')),
+          value=4
+        ),
+        tabPanel(
+          "Management Strategy Evaluation",
+          tabPanel("Tab1", uiOutput("MSEplots")),
+          #verbatimTextOutput("MPtest"),
+#          plotOutput("MSE_TO1_plot1"), 
+#          plotOutput("MSE_TO1_plot2"), 
+          value=5
+        ), id="conditionedPanels"
+        
+          #    h4("Which methods are available given data?"),
+  #    tableOutput('Can'),
+  #    h4("Which methods are not available and why?"),
+  #    tableOutput('Cant')
+      )    
+  #End of mainPanel
+  )
+    )
+      ))
