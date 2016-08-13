@@ -1,12 +1,20 @@
 #Needed libraries
-library(shiny)
-library(DLMtool)
-library(ggplot2)
-library(grid)
-library(reshape2)
+#library(shiny)
+#library(DLMtool)
+#library(ggplot2)
+#library(grid)
+#library(reshape2)
+#library(shinyjs)
+require(shiny)
+require(DLMtool)
+require(ggplot2)
+require(grid)
+require(reshape2)
+require(shinyjs)
 #Source code to load DLMtool objects
-
+#jsResetCode <- "shinyjs.reset = function() {history.go(0)}"
 source('load_DLM.r',local = FALSE)
+source('Functions.r',local = FALSE)
 #source("D:/JMC/Documents/GitHub/DLmethods tools/Shiny_DLMtool/load_DLM.r")
 #load.dlm.stuff<-function() {for(i in 1:length(DLMdat))assign(DLMdat[[i]]@Name,DLMdat[[i]])}
 #for(i in 1:length(DLMdat))assign(DLMdat[[i]]@Name,DLMdat[[i]])
@@ -76,20 +84,11 @@ shinyServer(function(input, output,session) {
     }
   }
 
-  #Read data file
-#  datafile<-reactive({
-#    inFile <- input$file1
-#    if (is.null(inFile)) return(NULL)
-#    if(is.null(inFile)=="FALSE"){
-#      dlm_input<-new("DLM_data",stock=inFile$datapath)
-#      return(dlm_input)
-#    }
-#    })
 ############################
 ### End function section ###
 ############################
 
-  dlmstuff<-reactive({load.dlm.stuff()})
+ # dlmstuff<-reactive({load.dlm.stuff()})
   #Start plots  
   output$Catchplot <- renderPlot({    
     inFile <- input$file1
@@ -353,31 +352,7 @@ shinyServer(function(input, output,session) {
     radioButtons("radio","Choose data-limited output control method to explore sensitivity",output.canlist)
   })
 
-  #Get input control methods that work with data set
-  #output$inctl.choices<-reactive({exists("input$file1")})
-  
-#  output$inctl.choicelist<-renderUI({
-#    inFile <- input$file1
-#    if (is.null(inFile)) return(NULL)
-#    input.canlist<-canlist()[canlist() %in% avail("DLM_input")]
-#    checkboxGroupInput("checkGroup","Available data-limited input control methods",input.canlist)
-#  })
-  
-#  observe({
-#    inFile <- input$file1
-#    if (is.null(inFile)) return(NULL)
-#    input.canlist<-canlist()[canlist() %in% avail("DLM_input")]
-#    if(input$selectall2 == 0) return(NULL) 
-#   else if (input$selectall2%%2 == 0)
-#    {
-#      updateCheckboxGroupInput(session,"checkGroup","Available data-limited input control methods", input.canlist)
-#    }
-#    else
-#    {
-#      updateCheckboxGroupInput(session,"checkGroup","Available data-limited input control methods",choices= input.canlist,selected= output.canlist)
-#    }
-#  })
- 
+
   #output the DL methods that are not available  
   output$MP_NA<-renderPrint({
     inFile <- input$file1
@@ -393,36 +368,30 @@ shinyServer(function(input, output,session) {
   
     
   #Run TAC and plot results
-  run.check<-eventReactive(input$run_dlm,{length(input$checkGroup)})
+  MP.labs<-eventReactive(input$run_dlm,{input$checkGroup})
   
-  TAC.out<-reactive({
-    if(run.check()>0){
+  TAC.out<-eventReactive(input$run_dlm,{
+    #if(run.check()>0){
       inFile <- input$file1
       if (is.null(inFile)) return(NULL)
       dlm_input<-new("DLM_data",stock=inFile$datapath)
-      TAC.out<-TAC(dlm_input,MPs=input$checkGroup)@TAC[,,1]
+      TAC.out<-TAC(dlm_input,MPs=input$checkGroup,reps=input$TACreps)@TAC[,,1]
       return(TAC.out)
     }
-  })
+  )
 
     output$TACplots<- renderPlot({    
-     inFile <- input$file1
-      if (is.null(inFile)) return(NULL)
-      dlm_input<-new("DLM_data",stock=inFile$datapath)
-      if(run.check()>0){
       TAC.out<-TAC.out()
       TAC.df<-data.frame(t(TAC.out))
-        #      TAC.df<-data.frame(t(TAC(dlm_input,MPs=input$checkGroup)@TAC[,,1]))
-      #TAC.df<-data.frame(t(dlm_input_TAC@TAC[,,1]))
-      if(length(input$checkGroup)==1){
+      if(is.null(dim(TAC.out))==TRUE){
         TAC.df.melt<-melt(TAC.df)
-        TAC.df.melt[,1]<-input$checkGroup
-        TAC.plot<-ggplot(data=TAC.df.melt,aes(as.factor(variable),value))+geom_boxplot()+ coord_flip()+labs(x="DL Method",y="TAC")
+        TAC.df.melt[,1]<-MP.labs()
+        TAC.plot<-ggplot(data=TAC.df.melt,aes(as.factor(variable),value))+geom_boxplot()+ coord_flip()+labs(x="DL Method",y="TAC")+ylim(0,quantile(TAC.out,0.95,na.rm=T))
         }
-      if(length(input$checkGroup)>1){
-        colnames(TAC.df)<-input$checkGroup
+      if(is.null(dim(TAC.out))==FALSE){
+        colnames(TAC.df)<-MP.labs()
         TAC.df.melt<-melt(TAC.df)
-        TAC.plot<-ggplot(data=TAC.df.melt,aes(as.factor(variable),value))+geom_boxplot()+ coord_flip()+labs(x="DL Method",y="TAC")
+        TAC.plot<-ggplot(data=TAC.df.melt,aes(as.factor(variable),value))+geom_boxplot()+ coord_flip()+labs(x="DL Method",y="TAC")+ylim(0,quantile(TAC.out,0.95,na.rm=T))
         }
       print(TAC.plot)
       output$downloadTAC <- downloadHandler(
@@ -431,25 +400,40 @@ shinyServer(function(input, output,session) {
       output$downloadTACobj <- downloadHandler(
         filename = function() {  paste0("TAC",Sys.time(),".DMP", sep='') },
         content = function(file) {save(TAC.out,file=file)}) 
-      }
+      output$downloadTACbarplot <- downloadHandler(
+        filename = function() { paste('TACbarplot',Sys.time(), '.png', sep='') },
+        content = function(file) {
+          png(file, type='cairo',width=800,height=720)
+          print(TAC.plot)
+          dev.off()},contentType = 'image/png') 
     })
+    
   
   output$wtedTAC<- renderPlot({    
-    Tac.density<-density(na.omit(c(TAC.out())))
-    plot(Tac.density,lwd=2.5,xlab="TAC",main="TAC distirbution (equally weighted among methods)")
-    })
+    TAC.df<-data.frame(t(TAC.out()))
+    TAC.df.melt<-melt(TAC.df)
+    TAC.densityplot<- ggplot(data=TAC.df.melt,aes(value))+geom_density(fill="gray")+xlim(0,quantile(TAC.out(),0.95,na.rm=T))+labs(x="TAC",y="Density")+ geom_vline(xintercept = quantile(TAC.out(),0.5,na.rm=T),color="darkblue",size=1.2)
+    print(TAC.densityplot)
+    output$downloadTACdensityplot <- downloadHandler(
+      filename = function() { paste('TACdensityplot',Sys.time(), '.png', sep='') },
+      content = function(file) {
+        png(file, type='cairo',width=800,height=720)
+        print(TAC.densityplot)
+        dev.off()},contentType = 'image/png') 
+  })
+  
 
   output$Sensiplot<-renderPlot({
     inFile <- input$file1
     if (is.null(inFile)) return(NULL)
     dlm_input<-new("DLM_data",stock=inFile$datapath)
-    TAC.out<-TAC(dlm_input,MPs=input$radio)
-    dlm_TAC_sensi<-Sense(TAC.out,input$radio)
+    TAC.out<-TAC(dlm_input,MPs=input$radio,reps=input$sensireps)
+    dlm_TAC_sensi<-Sense(TAC.out,MP=input$radio,nsense=input$nsensi,reps=input$sensireps,perc = c(input$lowperc,0.5,input$upperperc))
     output$downloadSensi <- downloadHandler(
       filename = function() { paste('Sensi',input$radio, '.png', sep='') },
       content = function(file) {
-        png(file, type='cairo')
-        Sense(TAC.out,input$radio)
+        png(file, type='cairo',width=800,height=720)
+        Sense(TAC.out,MP=input$radio,nsense=input$nsensi,reps=input$sensireps,perc = c(input$lowperc,0.5,input$upperperc))
         dev.off()},contentType = 'image/png') 
     })
   
@@ -457,19 +441,13 @@ shinyServer(function(input, output,session) {
 ######## MSE ##########
 #######################
   
-#    output$full.choicelist<-renderUI({
-#    inFile <- input$file1
-#    if (is.null(inFile)) return(NULL)
-#    input.canlist<-canlist()
-#    checkboxGroupInput("checkGroup","Available methods with control rules",input.canlist)
-#  })
 
   #ID output control rules
   output$can.list.output<-renderUI({
     inFile <- input$file1
     if (is.null(inFile)) return(NULL)
     canlist.output<-canlist()[canlist() %in% avail("DLM_output")]
-    checkboxGroupInput("checkGroup","Available output methods",canlist.output)
+    checkboxGroupInput("checkGroupout","Available output methods",canlist.output)
   })
   
   
@@ -480,11 +458,11 @@ shinyServer(function(input, output,session) {
     if(input$allselect == 0) return(NULL) 
     else if (input$allselect%%2 == 0)
     {
-      updateCheckboxGroupInput(session,"checkGroup","Available output methods", canlist.output)
+      updateCheckboxGroupInput(session,"checkGroupout","Available output methods", canlist.output)
     }
     else
     {
-      updateCheckboxGroupInput(session,"checkGroup","Available output methods",choices= canlist.output,selected= canlist.output)
+      updateCheckboxGroupInput(session,"checkGroupout","Available output methods",choices= canlist.output,selected= canlist.output)
     }
   })
  
@@ -493,7 +471,7 @@ shinyServer(function(input, output,session) {
     inFile <- input$file1
     if (is.null(inFile)) return(NULL)
     canlist.input<-canlist()[canlist() %in% avail("DLM_input")]
-    checkboxGroupInput("checkGroup2","Available input methods",canlist.input)
+    checkboxGroupInput("checkGroupin","Available input methods",canlist.input)
   })
   
   
@@ -504,11 +482,11 @@ shinyServer(function(input, output,session) {
     if(input$selectinput == 0) return(NULL) 
     else if (input$selectinput%%2 == 0)
     {
-      updateCheckboxGroupInput(session,"checkGroup2","Available input methods", canlist.input)
+      updateCheckboxGroupInput(session,"checkGroupin","Available input methods", canlist.input)
     }
     else
     {
-      updateCheckboxGroupInput(session,"checkGroup2","Available input methods",choices= canlist.input,selected= canlist.input)
+      updateCheckboxGroupInput(session,"checkGroupin","Available input methods",choices= canlist.input,selected= canlist.input)
     }
   })
  
@@ -560,6 +538,21 @@ shinyServer(function(input, output,session) {
       updateCheckboxGroupInput(session,"checkGroupNAin","Unavailable input methods",choices= cantlist.input,selected= cantlist.input)
     }
   })
+
+#Combine all selected MPs into one object
+    MPs<-reactive({
+    MPs<-c(input$checkGroupout,input$checkGroupin,input$checkGroupNAout,input$checkGroupNAin)
+    return(MPs)
+  })
+  
+#Choose with to plot for Kobe, projection and VOI
+  output$subMPs<-renderUI({
+    inFile <- input$file1
+    if (is.null(inFile)) return(NULL)
+    selectizeInput("plotsubMPs","Choose methods for the Kobe, projection and VOI plots",choices= MPs(),multiple=TRUE)
+  })
+    
+ # updateSelectizeInput(session,'subMPs',choices = MPs(), server = TRUE)
   
   
   #Stock inputs
@@ -687,15 +680,15 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$fleet, {output$fleet.L5<-renderUI({
-    sliderInput("L5","Length at 5% selectivity",min=0, max=1, value=get(input$fleet)@L5,step =1)
+    sliderInput("L5","Length at 5% selectivity",min=0, max=1, value=get(input$fleet)@L5,step =0.01)
     })
   })
   observeEvent(input$fleet, {output$fleet.LFS<-renderUI({
-    sliderInput("LFS","Length at full selectivity",min=0, max=1, value=get(input$fleet)@LFS,step =1)
+    sliderInput("LFS","Length at full selectivity",min=0, max=1, value=get(input$fleet)@LFS,step =0.01)
     })
   })
   observeEvent(input$fleet, {output$fleet.Vmaxlen<-renderUI({
-    sliderInput("Vmaxlen","Length at 5% selectivity",min=0, max=1, value=get(input$fleet)@Vmaxlen,step =1)
+    sliderInput("Vmaxlen","Length at 5% selectivity",min=0, max=1, value=get(input$fleet)@Vmaxlen,step =0.01)
     })
   })
   observeEvent(input$fleet, {output$fleet.Fsd<-renderUI({
@@ -932,17 +925,11 @@ shinyServer(function(input, output,session) {
     obsmod.in@beta<-input$beta
 
     OM<- new('OM',stock.in, fleet.in, obsmod.in)
-    #MPs<-c(input$checkGroup,input$checkGroup2,input$checkGroupNAout,input$checkGroupNAin)
-    #ourMSE <- runMSE(OpMod, MPs=MPs, proyears=input$Projyears, interval=input$MSE_intervals, nsim=input$numsims,reps=input$reps)
     return(OM)
   })
 
   
   
-    MPs<-reactive({
-    MPs<-c(input$checkGroup,input$checkGroup2,input$checkGroupNAout,input$checkGroupNAin)
-    return(MPs)
-  })
   
  #   output$MPtest <- renderPrint({    
 #      c(input$run_dlm_MSE,runMSE.box,run.check,runMSE.box)
@@ -959,15 +946,32 @@ shinyServer(function(input, output,session) {
 #    })
 #  })
 
+
     runMSE.box<-eventReactive(input$run_dlm_MSE,{
-          MSEout <- runMSE(OM(), MPs=MPs(), proyears=input$Projyears, interval=input$MSE_intervals, nsim=input$numsims,reps=input$reps)
+           progress <- shiny::Progress$new(session, min=1, max=2)
+           on.exit(progress$close())
+       
+           progress$set(message = 'MSE in progress',
+                        detail = '')
+       
+           for (i in 1:2) {
+             progress$set(value = i)
+             Sys.sleep(0.5)
+           }
+         MSEout <- runMSE(OM(), MPs=MPs(), proyears=input$Projyears, interval=input$MSE_intervals, nsim=input$numsims,reps=input$reps,pstar=input$pstar)
          return(MSEout)
     })
-      #MSEout<-reactive({
 
-      #})
-    
- 
+#MSE Summary table     
+  output$MSE_summary <- renderPrint({    
+      MSE.summary<-summary(runMSE.box())
+      MSEout<-runMSE.box()
+      output$downloadMSE <- downloadHandler(
+        filename = function() { paste0("MSEout",Sys.time(),".DMP", sep='') },
+        content = function(file) {save(MSEout,file=file)}) 
+      return(MSE.summary)
+    })
+#MSE Convergence plot    
   output$MSE_Convergence <- renderPlot({   
     MSEout<-runMSE.box()
     print(CheckConverg(MSEout))
@@ -978,7 +982,7 @@ shinyServer(function(input, output,session) {
         CheckConverg(MSEout)
         dev.off()},contentType = 'image/png') 
   })
-    
+#MSE trade-off plots    
   output$MSE_TO1_plot1 <- renderPlot({   
     MSEout<-runMSE.box()
     print(Tplot(MSEout,nam="F and biomass prop vs yield trade-offs"))
@@ -1001,124 +1005,100 @@ shinyServer(function(input, output,session) {
         dev.off()},contentType = 'image/png') 
   })
 
-  output$MSE_Kobe <- renderPlot({   
+##################
+# Full plots for Kobe, Pplot and VOI
+###################  
+#  output$MSE_Kobe <- renderPlot({   
+#    MSEout<-runMSE.box()
+#    print(Kplot(MSEout,nam="Kobe plot"))
+#    output$downloadMSE_Kobe <- downloadHandler(
+#      filename = function() {paste0("MSE_Kobe",Sys.time(),".png")},
+#      content = function(file) {
+#        png(file, type='cairo',width=800,height=720)
+#        Kplot(MSEout)
+#        dev.off()},contentType = 'image/png') 
+#  })
+
+#  output$MSE_Projplot <- renderPlot({   
+#    MSEout<-runMSE.box()
+#    print(Pplot(MSEout))
+#    output$downloadMSE_Pplot <- downloadHandler(
+#      filename = function() {paste0("MSE_Pplot",Sys.time(),".png")},
+#      content = function(file) {
+#        png(file, type='cairo',width=800,height=720)
+#        Pplot(MSEout)
+#        dev.off()},contentType = 'image/png') 
+#  })
+  
+#  output$MSE_VOI <- renderPlot({   
+#    MSEout<-runMSE.box()
+#    print(VOI(MSEout))
+#    output$downloadMSE_VOI <- downloadHandler(
+#      filename = function() {paste0("MSE_VOI",Sys.time(),".png")},
+#      content = function(file) {
+#        png(file, type='cairo',width=800,height=720)
+#        VOI(MSEout)
+#        dev.off()},contentType = 'image/png') 
+#  })
+###########################################################
+
+#######################################################
+### User controlled Kobe, Projection, and VOI plots ###
+#######################################################
+
+  output$MSE_Kobe2 <- renderPlot({   
     MSEout<-runMSE.box()
-    print(Kplot(MSEout,nam="Kobe plot"))
-    output$downloadMSE_Kobe <- downloadHandler(
+    subMPs<-input$plotsubMPs
+    if (is.null(subMPs)) subMPs<-MPs()
+    subMSE <- Sub(MSEout, MPs=subMPs)
+    print(Kplot2(subMSE,maxsim=input$Kplotmaxsim,nam="Kobe plot"))
+    output$downloadMSE_Kobe2 <- downloadHandler(
       filename = function() {paste0("MSE_Kobe",Sys.time(),".png")},
       content = function(file) {
         png(file, type='cairo',width=800,height=720)
-        Kplot(MSEout)
+        Kplot2(subMSE,maxsim=input$Kplotmaxsim,nam="Kobe plot")
         dev.off()},contentType = 'image/png') 
   })
   
-  output$MSE_Projplot <- renderPlot({   
+  output$MSE_Projplot2 <- renderPlot({   
     MSEout<-runMSE.box()
-    print(Pplot(MSEout))
-    output$downloadMSE_Pplot <- downloadHandler(
+    subMPs<-input$plotsubMPs
+    if (is.null(subMPs)) subMPs<-MPs()
+    subMSE <- Sub(MSEout, MPs=subMPs)
+    print(Pplot2(subMSE,nam="Projection plot"))
+    output$downloadMSE_Pplot2 <- downloadHandler(
       filename = function() {paste0("MSE_Pplot",Sys.time(),".png")},
       content = function(file) {
-      png(file, type='cairo',width=800,height=720)
-      Pplot(MSEout)
-      dev.off()},contentType = 'image/png') 
+        png(file, type='cairo',width=800,height=720)
+        Pplot2(subMSE,nam="Projection plot")
+        dev.off()},contentType = 'image/png') 
   })
 
-    output$MSE_VOI <- renderPlot({   
+    output$MSE_VOI2 <- renderPlot({   
       MSEout<-runMSE.box()
-      print(VOI(MSEout))
-    output$downloadMSE_VOI <- downloadHandler(
+      subMPs<-input$plotsubMPs
+      if (is.null(subMPs)) subMPs<-MPs()
+      subMSE <- Sub(MSEout, MPs=subMPs)
+      print(VOIplot(subMSE,nvars=input$VOInvars, nMP=input$VOInMPs))
+    output$downloadMSE_VOI2 <- downloadHandler(
       filename = function() {paste0("MSE_VOI",Sys.time(),".png")},
       content = function(file) {
-        png(file, type='cairo')
-        VOI(MSEout)
+        png(file, type='cairo',width=800,height=720)
+        VOIplot(subMSE,nvars=input$VOInvars, nMP=input$VOInMPs)
         dev.off()},contentType = 'image/png') 
     })
   
-    output$MSE_summary <- renderPrint({    
-         MSE.summary<-summary(runMSE.box())
-         MSEout<-runMSE.box()
-         output$downloadMSE <- downloadHandler(
-         filename = function() { paste0("MSEout",Sys.time(),".DMP", sep='') },
-         content = function(file) {save(MSEout,file=file)}) 
-         return(MSE.summary)
-         })
-    
     output$MSEplots <- renderUI({
       tabsetPanel(id = "subTabPanel1", 
-                  tabPanel("Convergence plot",plotOutput("MSE_Convergence",width="800px",height="720px"),downloadButton('downloadMSE_Converge', 'Download figures')),
-                  tabPanel("Trade-off plots",plotOutput("MSE_TO1_plot1",width="800px",height="720px"), downloadButton('downloadMSE_TOff1', 'Download Tradeoff Plot'), plotOutput("MSE_TO1_plot2",width="800px",height="500px"),downloadButton('downloadMSE_TOff2', 'Download Tradeoff Plot')),
-                  tabPanel("Kobe plot",plotOutput("MSE_Kobe",width="800px",height="720px"),downloadButton('downloadMSE_Kobe', 'Download figures')),
-                  tabPanel("Projection plot",plotOutput("MSE_Projplot",width="800px",height="720px"),downloadButton('downloadMSE_Pplot', 'Download figures')),
-                  tabPanel("Value of information",plotOutput("MSE_VOI"),downloadButton('downloadMSE_VOI', 'Download figures')),
-                  tabPanel("MSE summary",verbatimTextOutput("MSE_summary"),downloadButton('downloadMSE', 'Download MSE output'))
-      )            
-    })
+                  tabPanel("MSE summary",verbatimTextOutput("MSE_summary"),downloadButton('downloadMSE', 'Download MSE output')),
+                  tabPanel("Convergence plot",plotOutput("MSE_Convergence",width="800px",height="720px"),downloadButton('downloadMSE_Converge', 'Download convergence plots')),
+                  tabPanel("Trade-off plots",plotOutput("MSE_TO1_plot1",width="800px",height="720px"), downloadButton('downloadMSE_TOff1', 'Download trade-off plot'), plotOutput("MSE_TO1_plot2",width="800px",height="500px"),downloadButton('downloadMSE_TOff2', 'Download Tradeoff Plot')),
+                  tabPanel("Kobe plot",plotOutput("MSE_Kobe2",width="800px",height="720px"),downloadButton('downloadMSE_Kobe2', 'Download Kobe plots')),
+                  tabPanel("Projection plot",plotOutput("MSE_Projplot2",width="800px",height="720px"),downloadButton('downloadMSE_Pplot2', 'Download projection plots')),
+                  tabPanel("Value of information",plotOutput("MSE_VOI2",width="800px",height="720px"),downloadButton('downloadMSE_VOI2', 'Download VOI plots'))
+                  )            
+          })
     
 #End ShinyServer function
 })  
   
-
-
-
-
-#run.check<-eventReactive(input$run_dlm,{length(input$checkGroup)})
-#output$TACplots<- renderPlot({    
-#  inFile <- input$file1
-#  if (is.null(inFile)) return(NULL)
-#  dlm_input<-new("DLM_data",stock=inFile$datapath)
-#  if(run.check()>0){
-#    TAC.df<-data.frame(t(TAC(dlm_input,MPs=input$checkGroup)@TAC[,,1]))
-#    if(length(input$checkGroup)==1){
-#      TAC.df.melt<-melt(TAC.df)
-#      TAC.df.melt[,1]<-input$checkGroup
-#      TAC.plot<-ggplot(data=TAC.df.melt,aes(as.factor(variable),value))+geom_boxplot()+ coord_flip()+labs(x="DL Method",y="TAC")
-#    }
-#    if(length(input$checkGroup)>1){
-#      colnames(TAC.df)<-input$checkGroup
-#      TAC.df.melt<-melt(TAC.df)
-#      TAC.plot<-ggplot(data=TAC.df.melt,aes(as.factor(variable),value))+geom_boxplot()+ coord_flip()+labs(x="DL Method",y="TAC")
-#    }
-#    print(TAC.plot)
-#    output$downloadTAC <- downloadHandler(
-#      filename = function() { paste("TAC", '.csv', sep='') },
-#      content = function(file) {write.csv(TAC.df, file)}) 
-#  }
-#})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#OLD STUFF
-
-#Maturity
-#    if(any(is.na(c(dlm_input@L50,dlm_input@L95)))=="FALSE")
-#    {
-#      max.lt<-max(dlm_input@L95,dlm_input@vbLinf,na.rm = TRUE)
-#      if(max.lt== -Inf){max.lt<-100}
-#      dlm_input.mat<-data.frame(cbind(c(0:max.lt),Mat.fit(c(dlm_input@L95,dlm_input@L50),c(0:max.lt),return.type=1)))
-#      colnames(dlm_input.mat)<-c("Length","Proportion")
-#      dlm_input.mat.plot<-ggplot(dlm_input.mat,aes(Length,Proportion))+geom_line(lwd=2)+annotate("text",x=0.9*max(dlm_input.mat$Length),y=c(0.25,0.15),label=c(paste0("Lmat50=",round(dlm_input@L50,2)),paste0("Lmat95=",round(dlm_input@L95,2))),xmin=0,ymin=0,size=5) 
-#    }
-#    if(any(is.na(c(dlm_input@L50,dlm_input@L95)))=="TRUE")
-#    {
-#      df <- data.frame()
-#      dlm_input.mat.plot<-ggplot(df) + geom_point() + xlim(0, 0) + ylim(0, 0)+xlab("")+ylab("")+
-#      theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank())+
-#      theme(axis.title.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank())+
-#      annotate("text",x=0,y=0,label="Lt-Wt not available",size=5) 
-#    }
-
-#    print(dlm_input.mat.plot, vp = vplayout(2, 1))

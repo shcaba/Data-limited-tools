@@ -1,0 +1,4 @@
+*Indicate if MSE is running
+*Improve speed by consolidating certain runs
+*Clear for new data file
+*Make meaningful methods names

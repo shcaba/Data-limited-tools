@@ -1,7 +1,11 @@
-library(shiny)
-library(shinyFiles)
-library(DLMtool)
+#library(shiny)
+#library(shinyFiles)
+#library(DLMtool)
+require(shiny)
+require(shinyFiles)
+require(DLMtool)
 
+source('load_DLM.r',local = FALSE)
 
 shinyUI(fluidPage(
   titlePanel("Applying the DLMtool"),
@@ -15,15 +19,19 @@ shinyUI(fluidPage(
                 'text/plain',
                 '.csv','tmp'
               )
+    #actionButton("resetdata","Flush data file before loading new file")          
     ),
   conditionalPanel(
     condition="input.conditionedPanels==3",wellPanel(uiOutput("choicelist")),
+    fluidRow(column(3,numericInput("TACreps", "# of replicates", value=100,min=1, max=1000000, step=1))),
     actionButton("selectall","Select All"), 
     actionButton("run_dlm","Run catch estimates",icon("play-circle"),style="font-size:110%;border:2px solid;background:#ffffcc")
   ),
 
 conditionalPanel(
-  condition="input.conditionedPanels==4",wellPanel(uiOutput("sensilist"))
+  condition="input.conditionedPanels==4",wellPanel(uiOutput("sensilist")),
+  fluidRow(column(6,numericInput("nsensi", "# of total sensitivty values explored", value=6,min=1, max=100, step=1)),column(6,numericInput("sensireps", "# of samples used for sensitivity", value=100,min=1, max=100000, step=1))),
+  fluidRow(column(6,numericInput("lowperc", "Lower percentile reported", value=0.05,min=0, max=1, step=0.01)),column(6,numericInput("upperperc", "Upper percentile reported", value=0.95,min=0, max=1, step=0.01)))
 ),
 
 
@@ -36,6 +44,12 @@ conditionalPanel(
     br(),
     fluidRow(column(6,wellPanel(uiOutput("cant.list.output"))),column(6,wellPanel(uiOutput("cant.list.input")))),
     fluidRow(column(6,actionButton("allselectNAop","Select All output methods")),column(6,actionButton("allselectNAip","Select all input methods"))),
+    br(),
+    h3("Plotting MSE output"),
+    fluidRow(column(12,wellPanel(uiOutput("subMPs"),
+    fluidRow(column(6,numericInput("Kplotmaxsim", "Kobe plot: max # of sims to plot", value=60,min=0, max=10000, step=1))),
+    fluidRow(column(6,numericInput("VOInvars", "VOI plot: # of variables to show", value=5,min=0, max=20, step=1)),column(6,numericInput("VOInMPs", "VOI plot: # of MPs to plot", value=4,min=0, max=100, step=1))),
+    p("Note: VOI plot will only show up to the first 4 methods")))),
     
     br(),
     
@@ -87,16 +101,15 @@ conditionalPanel(
     #Get MSE specifications
     wellPanel(h4("MSE specifications"), 
     fluidRow(column(6,numericInput("Projyears", "# of projection years", value=20,min=1, max=1000, step=1)),column(6,numericInput("MSE_intervals", "Intervals of method application", value=5,min=1, max=200, step=1))),
-    fluidRow(column(6,numericInput("numsims", "# of simulations", value=10,min=1, max=1000, step=1)),column(6, numericInput("reps", "Repetitions", value=1,min=1, max=100, step=1)))
+    fluidRow(column(6,numericInput("numsims", "# of simulations", value=10,min=1, max=1000, step=1)),column(6, numericInput("reps", "Repetitions", value=1,min=1, max=100, step=1))),
+    fluidRow(column(6,numericInput("pstar", "P* quantile", value=0.5,min=0, max=0.5, step=0.01)))
     ),
     tags$head(tags$style(HTML('#run{background-color:orange}'))),
     actionButton("run_dlm_MSE",strong("Run MSE"),width="100%" ,icon("play-circle"),style="font-size:120%;border:2px solid;background:#ccffcc")
     )
 #End of sidebarPanel
    ),
-   #
-   #   checkboxGroupInput("checkGroup",label=h3("Available methods"),choices="Methods"=1,selected=1),
-    
+
     mainPanel(
       tabsetPanel(
         tabPanel(
@@ -113,6 +126,8 @@ conditionalPanel(
         "TAC estimators",plotOutput("TACplots"),plotOutput("wtedTAC"),
         downloadButton('downloadTAC', 'Download TAC values'),
         downloadButton('downloadTACobj', 'Download TAC R object'),
+        downloadButton('downloadTACbarplot', 'Download TAC barplot'),
+        downloadButton('downloadTACdensityplot', 'Download TAC denisty plot'),
         value=3
         ),
         tabPanel(
@@ -129,10 +144,6 @@ conditionalPanel(
           value=5
         ), id="conditionedPanels"
         
-          #    h4("Which methods are available given data?"),
-  #    tableOutput('Can'),
-  #    h4("Which methods are not available and why?"),
-  #    tableOutput('Cant')
       )    
   #End of mainPanel
   )
