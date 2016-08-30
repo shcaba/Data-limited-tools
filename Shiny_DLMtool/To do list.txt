@@ -1,4 +1,7 @@
-*Indicate if MSE is running
+*Improve indiactor running MSE
 *Improve speed by consolidating certain runs
 *Clear for new data file
 *Make meaningful methods names
+*Add age and lengths comps to the data tab
+*Offer user specified effort series for MSE
+
