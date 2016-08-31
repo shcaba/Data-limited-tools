@@ -1,3 +1,4 @@
+*Make all gradients zero in Stock section
 *Improve indiactor running MSE
 *Improve speed by consolidating certain runs
 *Clear for new data file
