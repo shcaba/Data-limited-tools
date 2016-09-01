@@ -576,8 +576,20 @@ shinyServer(function(input, output,session) {
   })
   observeEvent(input$stock, {output$stock.Mgrad<-renderUI({
     sliderInput("Mgrad","M gradient",min=-2, max=2, value=get(input$stock)@Mgrad,step =0.01)
-    })
   })
+  observe({
+    if (input$zerogradients%%2 == 0)
+    {
+      updateSliderInput(session,"Mgrad","M gradient",min=-2, max=2, value=get(input$stock)@Mgrad,step =0.01)
+    }
+    else
+    {
+      updateSliderInput(session,"Mgrad","M gradient",min=-2, max=2, value=c(0,0),step =0.01)
+    }
+  })
+  })
+  
+  
   observeEvent(input$stock, {output$stock.Linf<-renderUI({
     sliderInput("Linf","Linf",min=0, max=1500, value=get(input$stock)@Linf,step =1)
     })
@@ -589,6 +601,16 @@ shinyServer(function(input, output,session) {
   observeEvent(input$stock, {output$stock.Linfgrad<-renderUI({
     sliderInput("Linfgrad","Linf gradient",min=-2, max=2, value=get(input$stock)@Linfgrad,step =0.01)
     })
+  observe({
+    if (input$zerogradients%%2 == 0)
+    {
+      updateSliderInput(session,"Linfgrad","Linf gradient",min=-2, max=2, value=get(input$stock)@Linfgrad,step =0.01)
+    }
+    else
+    {
+      updateSliderInput(session,"Linfgrad","Linf gradient",min=-2, max=2, value=c(0,0),step =0.01)
+    }
+  })
   })
   observeEvent(input$stock, {output$stock.K<-renderUI({
     sliderInput("K","K",min=0, max=2, value=get(input$stock)@K,step =0.001)
@@ -601,6 +623,16 @@ shinyServer(function(input, output,session) {
   observeEvent(input$stock, {output$stock.Kgrad<-renderUI({
     sliderInput("Kgrad","K gradient",min=-2, max=2, value=get(input$stock)@Kgrad,step =0.01)
     })
+  observe({
+    if (input$zerogradients%%2 == 0)
+    {
+      updateSliderInput(session,"Kgrad","K gradient",min=-2, max=2, value=get(input$stock)@Kgrad,step =0.01)
+    }
+    else
+    {
+      updateSliderInput(session,"Kgrad","K gradient",min=-2, max=2, value=c(0,0),step =0.01)
+    }
+  })
   })
   observeEvent(input$stock, {output$stock.t0<-renderUI({
     sliderInput("t0","t0",min=-10, max=10, value=get(input$stock)@t0,step =0.01)
@@ -629,6 +661,16 @@ shinyServer(function(input, output,session) {
   observeEvent(input$stock, {output$stock.recgrad<-renderUI({
     sliderInput("recgrad","Rec. gradient",min=-10, max=10, value=get(input$stock)@recgrad,step =0.1)
     })
+  observe({
+    if (input$zerogradients%%2 == 0)
+    {
+      updateSliderInput(session,"recgrad","Rec. gradient",min=-10, max=10, value=get(input$stock)@recgrad,step =0.1)
+    }
+    else
+    {
+      updateSliderInput(session,"recgrad","Rec. gradient",min=-10, max=10, value=c(0,0),step =0.1)
+    }
+  })
   })
   observeEvent(input$stock, {output$stock.Perr<-renderUI({
     sliderInput("Perr","Rec. dev. error",min=0, max=2, value=get(input$stock)@Perr,step =0.1)

@@ -57,6 +57,7 @@ conditionalPanel(
     
     wellPanel(fluidRow(column(12, uiOutput("stock.choicelist"))),
     h4("User modifications"), 
+    fluidRow(column(6, actionButton("zerogradients","Zero all gradient values?"))),
     fluidRow(column(6, uiOutput("stock.maxage"))),
     fluidRow(column(4, uiOutput("stock.M")),column(4, uiOutput("stock.Msd")),column(4, uiOutput("stock.Mgrad"))),
     fluidRow(column(4, uiOutput("stock.Linf")),column(4, uiOutput("stock.Linfsd")),column(4, uiOutput("stock.Linfgrad"))),
