@@ -1,3 +1,4 @@
+DLMtool
 *Make all gradients zero in Stock section
 *Improve indiactor running MSE
 *Improve speed by consolidating certain runs
@@ -6,3 +7,7 @@
 *Add age and lengths comps to the data tab
 *Offer user specified effort series for MSE
 
+
+Natural mortality tool
+Add composite M distribution
+Add choice of weighting of each method
