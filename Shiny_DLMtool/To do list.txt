@@ -11,3 +11,13 @@ DLMtool
 Natural mortality tool
 Add composite M distribution
 Add choice of weighting of each method
+
+Demos
+Natural mortality- DONE
+Fishtraits- DONE
+PSA- DONE
+YPR
+DLMtool- DONE
+LBSPR
+SSS
+BASI (with DLMtool)
