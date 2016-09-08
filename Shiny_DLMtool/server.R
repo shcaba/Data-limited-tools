@@ -305,7 +305,6 @@ shinyServer(function(input, output,session) {
     })
   
   #Get output control methods that work with data set
-  
   canlist<-reactive({
     inFile <- input$file1
     if (is.null(inFile)) return(NULL)
@@ -319,7 +318,6 @@ shinyServer(function(input, output,session) {
     dlm_input<-new("DLM_data",stock=inFile$datapath)
     cantlist<-Cant(dlm_input)
   })
-  
   
    output$choicelist<-renderUI({
     inFile <- input$file1
@@ -364,8 +362,6 @@ shinyServer(function(input, output,session) {
       return(cant.table)
     }
   })
-  
-  
     
   #Run TAC and plot results
   MP.labs<-eventReactive(input$run_dlm,{input$checkGroup})

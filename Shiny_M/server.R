@@ -54,7 +54,7 @@ shinyServer(
     }
     
     
-     dataInput<- reactive({
+     M_vals<- reactive({
       Pauly80lt_M<-Pauly80wt_M<-AnC75_M<-Roff_M<-GnD_GSI_M<-PnW_M<-Lorenzen96_M<-Gislason_M<-NA
       Then_M_Amax<-Then_M(input$Amax)
       if(!(anyNA(c(input$k,input$Amax)))){AnC75_M<-M.empirical(Kl=input$k,tmax=input$Amax,method=4)[1]}
@@ -73,10 +73,29 @@ shinyServer(
       M_methods<-c("Then_Amax 1","Then_Amax 2","Then_Amax 3","Hamel_Amax","AnC","Then_VBGF","Jensen_VBGF 1","Jensen_VBGF 2","Pauly_lt","Pauly_wt","Gislason","Chen-Wat","Roff","Jensen_Amat","PnW","Lorenzen","GSI")
       M_table<-data.frame(cbind(M_methods,M_vals_all))
       colnames(M_table)<-c("Method","M")
-      return(M_table)
+      M_table
      })
     
-    output$Mplot <- renderPlot({
+     M_vals_all<- reactive({
+       Pauly80lt_M<-Pauly80wt_M<-AnC75_M<-Roff_M<-GnD_GSI_M<-PnW_M<-Lorenzen96_M<-Gislason_M<-NA
+       Then_M_Amax<-Then_M(input$Amax)
+       if(!(anyNA(c(input$k,input$Amax)))){AnC75_M<-M.empirical(Kl=input$k,tmax=input$Amax,method=4)[1]}
+       Then_M_VBGF<-Then_VBGF(input$Linf*10,input$k)
+       Jensen_M_VBGF<-Jensen_M_k(input$k) 
+       if(!(anyNA(c(input$Linf,input$k,input$Bl)))){Gislason_M<-M.empirical(Linf=input$Linf,Kl=input$k,Bl=input$Bl,method=9)[1]}
+       CnW_M_VBGF<-Chen_N_Wat_M(input$Amax,iput$Amat,input$k,input$t0)
+       if(!(anyNA(c(input$k,input$Amat)))){Roff_M<-M.empirical(Kl=input$k,tm=input$Amat,method=5)[1]}
+       Jensen_M_Amat<-Jensen_M_amat(input$Amat)
+       if(!(anyNA(c(input$Wdry)))){PnW_M<-M.empirical(Wdry=input$Wdry,method=7)[1]}
+       if(!(anyNA(c(input$Wwet)))){Lorenzen96_M<-M.empirical(Wwet=input$Wwet,method=8)[1]}
+       if(!(anyNA(c(input$Linf,input$k,input$Temp)))){Pauly80lt_M<-M.empirical(Linf=input$Linf,Kl=input$k,T=input$Temp,method=1)[1]}
+       if(!(anyNA(c(input$Winf,input$kw,input$Temp)))){Pauly80wt_M<-M.empirical(Winf=input$Winf,Kw=input$kw,T=input$Temp,method=2)[1]}
+       if(!(anyNA(c(input$GSI)))){GnD_GSI_M<-M.empirical(GSI=input$GSI,method=6)[1]}
+       M_vals_all<-c(Then_M_Amax,AnC75_M,Then_M_VBGF,Jensen_M_VBGF,Pauly80lt_M,Pauly80wt_M,Gislason_M,CnW_M_VBGF,Roff_M,Jensen_M_Amat,PnW_M,Lorenzen96_M,GnD_GSI_M)
+       M_vals_all
+     })
+     
+     output$Mplot <- renderPlot({
   # mvals_all<-dataInput()
         Pauly80lt_M<-Pauly80wt_M<-AnC75_M<-Roff_M<-GnD_GSI_M<-PnW_M<-Lorenzen96_M<-Gislason_M<-NA
         Then_M_Amax<-Then_M(input$Amax)
@@ -93,7 +112,7 @@ shinyServer(
         if(!(anyNA(c(input$Winf,input$kw,input$Temp)))){Pauly80wt_M<-M.empirical(Winf=input$Winf,Kw=input$kw,T=input$Temp,method=2)[1]}
         if(!(anyNA(c(input$GSI)))){GnD_GSI_M<-M.empirical(GSI=input$GSI,method=6)[1]}
       
-        M_vals_all<-c(Then_M_Amax,AnC75_M,Then_M_VBGF,Jensen_M_VBGF,Pauly80lt_M,Gislason_M,CnW_M_VBGF,Roff_M,Jensen_M_Amat,Pauly80wt_M,PnW_M,Lorenzen96_M,GnD_GSI_M)
+      M_vals_all<-c(Then_M_Amax,AnC75_M,Then_M_VBGF,Jensen_M_VBGF,Pauly80lt_M,Gislason_M,CnW_M_VBGF,Roff_M,Jensen_M_Amat,Pauly80wt_M,PnW_M,Lorenzen96_M,GnD_GSI_M)
       M_methods<-c("Then_Amax 1","Then_Amax 2","Then_Amax 3","Hamel_Amax","AnC","Then_VBGF","Jensen_VBGF 1","Jensen_VBGF 2","Pauly_lt","Gislason","Chen-Wat","Roff","Jensen_Amat","Pauly_wt","PnW","Lorenzen","GSI")
   # plot M
   if(all(is.na(M_vals_all))){ymax<-0.5}
@@ -158,8 +177,30 @@ output$Mtable2 <- renderTable({
 })
 output$downloadData <- downloadHandler(
   filename = function() { paste("M_values", '.csv', sep='') },
-  content = function(file) {write.csv(dataInput(), file=)}
+  content = function(file) {write.csv(M_vals(), file=)}
 )
+
+#Plot Composite M
+output$Mcomposite<- renderPlot({    
+  M.wts<-c(input$Then_Amax_1,input$Then_Amax_2,input$Then_Amax_3,input$Hamel_Amax,input$AnC,input$Then_VBGF,input$Jensen_VBGF_1,input$Jensen_VBGF_2,input$Pauly_lt,input$Gislason,input$Chen_Wat,input$Roff,input$Jensen_Amat,input$Pauly_wt,input$PnW,input$Lorenzen,input$Gonosoma)
+  NA.ind<-attributes(na.omit(M_vals_all()))$na.action
+  M.sub<-M_vals_all()[-NA.ind]
+  M.melt<-melt(M.sub)
+  M.wts.sub<-M.wts[-NA.ind]
+  M.wts.sub.stand<-M.wts.sub/sum(M.wts.sub)
+  Mcomposite.densityplot<- ggplot(data=M.melt,aes(value, weight=M.wts.sub.stand))+geom_density(fill="gray") +xlim(0,quantile(M.melt,0.95,na.rm=T))+labs(x="Natural Mortality",y="Density")+ geom_vline(xintercept = quantile(M.melt,0.5,na.rm=T),color="darkblue",size=1.2)
+  print(Mcomposite.densityplot)
+  M.densum<-density(M_vals_all()[-NA.ind],weights=M.wts.sub.stand)
+  output$downloadMcompositedensityplot <- downloadHandler(
+    filename = function() { paste('Mcomposite_densityplot',Sys.time(), '.png', sep='')},
+    content = function(file) {
+      png(file, type='cairo',width=800,height=720)
+      print(Mcomposite.densityplot)
+      dev.off()},contentType = 'image/png') 
+  output$downloadMcompositedist <- downloadHandler(
+    filename = function() {  paste0("Mcomposite",Sys.time(),".DMP", sep='') },
+    content = function(file) {save(M.densum,file=file)}) 
+})
   }
 )
 
