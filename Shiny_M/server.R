@@ -182,15 +182,21 @@ output$downloadData <- downloadHandler(
 
 #Plot Composite M
 output$Mcomposite<- renderPlot({    
+  if(all(is.na(M_vals_all()))){return(NULL)}
+  else{
   M.wts<-c(input$Then_Amax_1,input$Then_Amax_2,input$Then_Amax_3,input$Hamel_Amax,input$AnC,input$Then_VBGF,input$Jensen_VBGF_1,input$Jensen_VBGF_2,input$Pauly_lt,input$Gislason,input$Chen_Wat,input$Roff,input$Jensen_Amat,input$Pauly_wt,input$PnW,input$Lorenzen,input$Gonosoma)
+  #remove NAs
   NA.ind<-attributes(na.omit(M_vals_all()))$na.action
   M.sub<-M_vals_all()[-NA.ind]
-  M.melt<-melt(M.sub)
   M.wts.sub<-M.wts[-NA.ind]
-  M.wts.sub.stand<-M.wts.sub/sum(M.wts.sub)
-  Mcomposite.densityplot<- ggplot(data=M.melt,aes(value, weight=M.wts.sub.stand))+geom_density(fill="gray") +xlim(0,quantile(M.melt,0.95,na.rm=T))+labs(x="Natural Mortality",y="Density")+ geom_vline(xintercept = quantile(M.melt,0.5,na.rm=T),color="darkblue",size=1.2)
+  #remove 0 weight
+  M.sub.n0<-M.sub[M.wts.sub>0]
+  M.wts.sub.n0<-M.wts.sub[M.wts.sub>0]
+  M.wts.sub.stand<-M.wts.sub.n0/sum(M.wts.sub.n0)
+  M.densum<-density(M.sub.n0,weights=M.wts.sub.stand)
+  M.densum.plot<- data.frame(x = M.densum$x, y = M.densum$y)
+  Mcomposite.densityplot<- ggplot(data=M.densum.plot,aes(x,y,fill="blue"))+geom_line(col="black")+labs(x="Natural Mortality",y="Density")+ geom_area(fill="gray")+ geom_vline(xintercept = quantile(M.sub.n0,0.5,na.rm=T, weights=M.wts.sub.stand.n0),color="darkblue",size=1.2)
   print(Mcomposite.densityplot)
-  M.densum<-density(M_vals_all()[-NA.ind],weights=M.wts.sub.stand)
   output$downloadMcompositedensityplot <- downloadHandler(
     filename = function() { paste('Mcomposite_densityplot',Sys.time(), '.png', sep='')},
     content = function(file) {
@@ -200,7 +206,8 @@ output$Mcomposite<- renderPlot({
   output$downloadMcompositedist <- downloadHandler(
     filename = function() {  paste0("Mcomposite",Sys.time(),".DMP", sep='') },
     content = function(file) {save(M.densum,file=file)}) 
-})
+  }
+  })
   }
 )
 

@@ -8,6 +8,8 @@ DLMtool
 
 
 Natural mortality tool
+Add the equations as a pop-up
+Add references
 
 Demos
 Natural mortality- DONE

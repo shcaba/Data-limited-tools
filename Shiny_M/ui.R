@@ -2,9 +2,12 @@ library(shiny)
 
 shinyUI(
   fluidPage(
-    titlePanel("Estimating life history values"),
+    titlePanel("Estimating Natural Mortality (M)"),
+    h5(p(em("This tool employs various empirical estimators of natural mortality."))),
+    h5(p(em("As the user enters values for the below input parameters,"))), 
+    h5(p(em("estimates will be displayed in the main panel."))),
     headerPanel("Input parameters"),
-       sidebarLayout(
+    sidebarLayout(
         sidebarPanel
        (
         numericInput("Amax", "Maximum age (years):", value=NA,min=1, max=300, step=0.1),    
@@ -24,7 +27,7 @@ shinyUI(
        br(),
        
        h3("Composite M: method weighting"),
-       h5("Allows for weighting of the contribution of each method in the composite M distribution"),
+       h5(p(em("Allows for weighting of the contribution of each method in the composite M distribution"))),
        h5("Values range from 0 to 1. A value of 0 removes the contribution; a value of 1 is full weighting."),
        wellPanel(
           fluidRow(
@@ -69,6 +72,7 @@ shinyUI(
             br(),
             br(),
             h4("Composite natural mortality"),
+            h5(p(em("Blue vertical line indicates median value"))),
             plotOutput("Mcomposite"),
             downloadButton('downloadMcompositedensityplot', 'Download composite M denisty plot'),
             downloadButton('downloadMcompositedist', 'Download desciptive statistics of composite M')
