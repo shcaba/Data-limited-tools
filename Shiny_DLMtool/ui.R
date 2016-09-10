@@ -19,11 +19,16 @@ shinyUI(fluidPage(
                 'text/plain',
                 '.csv','tmp'
               )
-    #actionButton("resetdata","Flush data file before loading new file")          
+              #              actionButton("resetdata","Flush data file before loading new file")          
     ),
-  conditionalPanel(
+    conditionalPanel(
+      condition="input.conditionedPanels==1",
+      p("Click", tags$a(href="javascript:window.open('DLMobject_slots.html', '_blank','width=600,height=400')", "here"), "for a desciption of the DLM object inputs.")
+    ),
+    conditionalPanel(
     condition="input.conditionedPanels==3",wellPanel(uiOutput("choicelist"),
-    p("Click", tags$a(href="javascript:window.open('DLMtool_methods_codes.html', '_blank','width=600,height=400')", "here"), "for a key and desciption of the above methods.")),
+    p("Click", tags$b(href="javascript:window.open('DLMtool_methods_codes.html', '_blank','width=600,height=400')", "here"), "for a key and desciption of the above methods.")
+    ),
     fluidRow(column(3,numericInput("TACreps", "# of replicates", value=100,min=1, max=1000000, step=1))),
     actionButton("selectall","Select All"), 
     actionButton("run_dlm","Run catch estimates",icon("play-circle"),style="font-size:110%;border:2px solid;background:#ffffcc")
@@ -57,6 +62,7 @@ conditionalPanel(
     br(),
     
     h3("Build the Operating Model"), 
+    p("Click", tags$a(href="javascript:window.open('OM_input_deescriptions.html', '_blank','width=600,height=400')", "here"), "for a description of each OM input."),
     
     wellPanel(fluidRow(column(12, uiOutput("stock.choicelist"))),
     h4("User modifications"), 
