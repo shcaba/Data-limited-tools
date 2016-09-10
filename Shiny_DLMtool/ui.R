@@ -22,7 +22,8 @@ shinyUI(fluidPage(
     #actionButton("resetdata","Flush data file before loading new file")          
     ),
   conditionalPanel(
-    condition="input.conditionedPanels==3",wellPanel(uiOutput("choicelist")),
+    condition="input.conditionedPanels==3",wellPanel(uiOutput("choicelist"),
+    p("Click", tags$a(href="javascript:window.open('DLMtool_methods_codes.html', '_blank','width=600,height=400')", "here"), "for a key and desciption of the above methods.")),
     fluidRow(column(3,numericInput("TACreps", "# of replicates", value=100,min=1, max=1000000, step=1))),
     actionButton("selectall","Select All"), 
     actionButton("run_dlm","Run catch estimates",icon("play-circle"),style="font-size:110%;border:2px solid;background:#ffffcc")
@@ -38,6 +39,8 @@ conditionalPanel(
   conditionalPanel(
     condition="input.conditionedPanels==5",
     h3("Select control methods to test in MSE"), 
+    p("Click", tags$a(href="javascript:window.open('DLMtool_methods_codes.html', '_blank','width=600,height=400')", "here"), "for a key and description of each method."),
+    #p("Click", tags$a(href="javascript:window.open('DLMtool_methods_codes.htm', '_blank','width=600,height=400')", "here"), "for a glossary of the terms used in this demo."), style="background-color: #ffffff;"),
     fluidRow(column(6,wellPanel(uiOutput("can.list.output"))),column(6,wellPanel(uiOutput("can.list.input")))),
     fluidRow(column(6,actionButton("allselect","Select All output methods")),column(6,actionButton("selectinput","Select all input methods"))),
     br(),
