@@ -1,10 +1,10 @@
 DLMtool
+*Offer user specified effort series for MSE
 *Improve indiactor running MSE
 *Improve speed by consolidating certain runs
 *Clear for new data file
 *Make meaningful methods names
 *Add age and lengths comps to the data tab
-*Offer user specified effort series for MSE
 
 
 Natural mortality tool
@@ -15,9 +15,9 @@ Demos
 Natural mortality- DONE
 Fishtraits- DONE
 PSA- DONE
-YPR
+YPR- DONE
 DLMtool- DONE
-LBSPR
+LBSPR- DONE
 SSS
 BASI (with DLMtool)
 

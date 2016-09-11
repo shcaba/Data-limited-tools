@@ -1,5 +1,7 @@
-library(shiny)
-library(fishmethods)
+require(shiny)
+require(fishmethods)
+require(ggplot2)
+
 shinyServer(
   function(input, output) 
   {    
