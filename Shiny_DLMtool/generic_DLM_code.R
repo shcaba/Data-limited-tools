@@ -28,3 +28,44 @@ Example_DCAC_sensi<-Sense(Ex_dlm.data.TAC,"DCAC")
 #############################
 
 ###### MSE Example ######
+#Make newe Operating model
+avail('Stock')
+ourstock <- Snapper
+slotNames(ourstock)
+ourstock@M
+
+# Overwrite the pre-specified property values 
+ourstock@M <- c(0.2,0.25)
+ourstock@maxage <- 18
+ourstock@D <- c(0.05,0.3)
+ourstock@Frac_area_1 <- c(0.05,0.15)
+ourstock@Prob_staying <- c(0.4,0.99)
+#Expore or change inputs
+slotNames(OM)
+OM@Name
+
+# Choose a fleet type and 
+# generic fleet of flat recent effort, adding dome-shaped vulnerability as a possibility for older age classes: 
+avail("Fleet")
+ourfleet <- Generic_FlatE
+ourfleet@Vmaxlen <- c(0.5, 1)
+
+avail("Observation")
+ourOM <- new('OM',ourstock, ourfleet, Imprecise_Biased)
+
+#Choose which methods to test
+MPs <- c("BK", "CC1", "CompSRA", "DBSRA", "DBSRA4010", "DCAC", "DCAC4010", "DepF", "DynF",
+         "EDCAC", "Fratio", "Itarget1", "Itarget4", "MCD", "MCD4010", "SBT1")
+
+#Run MSE
+ourMSE <- runMSE(ourOM, MPs=MPs, proyears=20, interval=5, nsim=16,reps=1)
+
+#Summarize results
+Results <- summary(ourMSE) 
+
+#Plots
+plot(ourMSE)
+Tplot(ourMSE) # trade-offs plot
+Pplot(ourMSE) # overfishing trajectories plot
+Kplot(ourMSE) # kobe plots
+VOI(ourMSE) #value of information plot
