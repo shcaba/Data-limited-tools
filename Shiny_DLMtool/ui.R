@@ -27,7 +27,7 @@ shinyUI(fluidPage(
     ),
     conditionalPanel(
     condition="input.conditionedPanels==3",wellPanel(uiOutput("choicelist"),
-    p("Click", tags$b(href="javascript:window.open('DLMtool_methods_codes.html', '_blank','width=600,height=400')", "here"), "for a key and desciption of the above methods.")
+    p("Click", tags$a(href="javascript:window.open('DLMtool_methods_codes.html', '_blank','width=600,height=400')", "here"), "for a key and desciption of the above methods.")
     ),
     fluidRow(column(3,numericInput("TACreps", "# of replicates", value=100,min=1, max=1000000, step=1))),
     actionButton("selectall","Select All"), 
