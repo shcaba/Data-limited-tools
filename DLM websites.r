@@ -1,4 +1,6 @@
-Data-limited methods toolbox (Barefoot ecologist): 
+Data-limited methods toolbox (Barefoot ecologist): http://barefootecologist.com.au/
 DLMtool website: http://www.datalimitedtoolkit.org/
 Jason Cope's GitHub: https://github.com/shcaba
-Jim Thorson's FishTraits GitHub: https://github.com/James-Thorson/FishTraits/
+
+
+Margarita's: http://www.ices.dk/news-and-events/news-archive/news/Pages/IJMS-Editor%E2%80%99s-Choice-%E2%80%93-the-economic-value-of-environmental-data.aspx
