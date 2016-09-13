@@ -5,6 +5,8 @@ DLMtool
 *Clear for new data file
 *Make meaningful methods names
 *Add age and lengths comps to the data tab
+*Choose qunatile on TAC plot
+*Download sensitivity values
 
 
 Natural mortality tool

@@ -408,7 +408,11 @@ shinyServer(function(input, output,session) {
   output$wtedTAC<- renderPlot({    
     TAC.df<-data.frame(t(TAC.out()))
     TAC.df.melt<-melt(TAC.df)
-    TAC.densityplot<- ggplot(data=TAC.df.melt,aes(value))+geom_density(fill="gray")+xlim(0,quantile(TAC.out(),0.95,na.rm=T))+labs(x="TAC",y="Density")+ geom_vline(xintercept = quantile(TAC.out(),0.5,na.rm=T),color="darkblue",size=1.2)
+    TAC.densityplot<- ggplot(data=TAC.df.melt,aes(value))+
+      geom_density(fill="gray")+xlim(0,quantile(TAC.out(),0.95,na.rm=T))+
+      labs(x="TAC",y="Density")+
+      geom_vline(xintercept = quantile(TAC.out(),0.5,na.rm=T),color=c("darkblue"),size=1.2)+
+      geom_vline(xintercept = quantile(TAC.out(),input$Pstar,na.rm=T),linetype = "longdash",color="darkgreen",size=1)
     print(TAC.densityplot)
     output$downloadTACdensityplot <- downloadHandler(
       filename = function() { paste('TACdensityplot',Sys.time(), '.png', sep='') },
@@ -431,7 +435,10 @@ shinyServer(function(input, output,session) {
         png(file, type='cairo',width=800,height=720)
         Sense(TAC.out,MP=input$radio,nsense=input$nsensi,reps=input$sensireps,perc = c(input$lowperc,0.5,input$upperperc))
         dev.off()},contentType = 'image/png') 
-    })
+    output$downloadSensiobj <- downloadHandler(
+      filename = function() {  paste0("Sensitivities_",input$radio,"_",Sys.time(),".DMP", sep='') },
+      content = function(file) {save(dlm_TAC_sensi,file=file)}) 
+  })
   
 #######################
 ######## MSE ##########

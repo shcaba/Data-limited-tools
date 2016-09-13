@@ -27,10 +27,10 @@ shinyUI(fluidPage(
     ),
     conditionalPanel(
     condition="input.conditionedPanels==3",wellPanel(uiOutput("choicelist"),
-    p("Click", tags$a(href="javascript:window.open('DLMtool_methods_codes.html', '_blank','width=600,height=400')", "here"), "for a key and desciption of the above methods.")
+    p("Click", tags$a(href="javascript:window.open('DLMtool_methods_codes.html', '_blank','width=600,height=400')", "here"), "for a key and desciption of the above methods."),
+    actionButton("selectall","Select All")
     ),
-    fluidRow(column(3,numericInput("TACreps", "# of replicates", value=100,min=1, max=1000000, step=1))),
-    actionButton("selectall","Select All"), 
+    fluidRow(column(3,numericInput("TACreps", "# of replicates", value=100,min=1, max=1000000, step=1)),column(3,numericInput("Pstar", "Buffer quantile", value=0.4,min=0, max=1, step=0.01))),
     actionButton("run_dlm","Run catch estimates",icon("play-circle"),style="font-size:110%;border:2px solid;background:#ffffcc")
   ),
 
@@ -143,6 +143,7 @@ conditionalPanel(
         tabPanel(
           "TAC sensitivities",column(12,plotOutput("Sensiplot",height = 800, width = 1000)),
           column(2,downloadButton('downloadSensi', 'Download plots')),
+          column(2,downloadButton('downloadSensiobj', 'Download R object')),
           value=4
         ),
         tabPanel(
