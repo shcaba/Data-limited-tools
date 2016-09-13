@@ -1,27 +1,16 @@
-DLMtool
+#Shiny DLMtool
 *Offer user specified effort series for MSE
 *Improve indiactor running MSE
 *Improve speed by consolidating certain runs
 *Clear for new data file
 *Make meaningful methods names
 *Add age and lengths comps to the data tab
-*Choose qunatile on TAC plot
-*Download sensitivity values
 
 
-Natural mortality tool
-Add the equations as a pop-up
-Add references
+#Shiny Natural mortality tool
+*Add the equations as a pop-up
+*Add references
 
-Demos
-Natural mortality- DONE
-Fishtraits- DONE
-PSA- DONE
-YPR- DONE
-DLMtool- DONE
-LBSPR- DONE
-SSS
-BASI (with DLMtool)
 
 #Improvements to DLMtool
 age-specific M

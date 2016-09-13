@@ -30,7 +30,7 @@ shinyUI(fluidPage(
     p("Click", tags$a(href="javascript:window.open('DLMtool_methods_codes.html', '_blank','width=600,height=400')", "here"), "for a key and desciption of the above methods."),
     actionButton("selectall","Select All")
     ),
-    fluidRow(column(3,numericInput("TACreps", "# of replicates", value=100,min=1, max=1000000, step=1)),column(3,numericInput("Pstar", "Buffer quantile", value=0.4,min=0, max=1, step=0.01))),
+    fluidRow(column(3,numericInput("TACreps", "# of replicates", value=100,min=1, max=1000000, step=1)),column(3,numericInput("Pstar", "Buffer quantile", value=0.4,min=0, max=1, step=0.01)),column(6,p(br(),br(),strong("solid line")," = median",br(),strong("broken line")," = buffer quantile"))),
     actionButton("run_dlm","Run catch estimates",icon("play-circle"),style="font-size:110%;border:2px solid;background:#ffffcc")
   ),
 
