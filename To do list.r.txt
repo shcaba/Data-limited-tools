@@ -5,12 +5,11 @@
 *Clear for new data file
 *Make meaningful methods names
 *Add age and lengths comps to the data tab
-
+*Add stock inputs that would use the DLMobject inputs
 
 #Shiny Natural mortality tool
 *Add the equations as a pop-up
 *Add references
-
 
 #Improvements to DLMtool
 age-specific M
@@ -19,3 +18,4 @@ coorelations in paramter draws
 MSE improvements: 
 Need user-specified reference points.
 Better transparency of reference points.
+Add crustsacean example for stock OM

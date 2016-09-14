@@ -733,7 +733,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$fleet, {output$fleet.Vmaxlen<-renderUI({
-    sliderInput("Vmaxlen","Length at 5% selectivity",min=0, max=1, value=get(input$fleet)@Vmaxlen,step =0.01)
+    sliderInput("Vmaxlen","Selectivity of the longest length class",min=0, max=1, value=get(input$fleet)@Vmaxlen,step =0.01)
     })
   })
   observeEvent(input$fleet, {output$fleet.Fsd<-renderUI({
