@@ -9,7 +9,9 @@
 *Add run indicator for the TAC tab
 *Add composite TAC values download
 *Add list of MPs even when dlm object is not there
-*Magic button for deterministic run: Make SDs 0, make LH values same for both slider values
+*Magic button for deterministic run: Make SDs 0, make LH values same for both slider values. Work with Chantel to make sure fleet and 
+*VOI plot: # of MPs to plot-- is this redundant to the "Choose methods for the Kobe, projection and VOI plots"
+*When custsomizing your stock, fleet and Obs inputs, have a choice to save them.
 
 #Shiny Natural mortality tool
 *Add the equations as a pop-up
@@ -23,3 +25,4 @@ MSE improvements:
 Need user-specified reference points.
 Better transparency of reference points.
 Add crustsacean example for stock OM
+Make a deterministic run easy to do

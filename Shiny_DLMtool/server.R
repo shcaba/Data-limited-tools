@@ -650,7 +650,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$stock, {output$stock.R0<-renderUI({
-    numericInput("R0","Initial recruitment",value=get(input$stock)@R0,min=0, max=1000000, step=10)
+    numericInput("R0","Initial recruitment (R0)",value=get(input$stock)@R0,min=0, max=1000000, step=10)
     })
   })
   observeEvent(input$stock, {output$stock.SRrel<-renderUI({
@@ -704,7 +704,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$stock, {output$stock.Frac_area<-renderUI({
-    sliderInput("Frac_area","Fraction of unfished B in area",min=0, max=1, value=get(input$stock)@Frac_area_1,step =0.01)
+    sliderInput("Frac_area","Fraction of initial unfished B in area",min=0, max=1, value=get(input$stock)@Frac_area_1,step =0.01)
     })
   })
   
@@ -717,7 +717,7 @@ shinyServer(function(input, output,session) {
   })
 
   observeEvent(input$fleet, {output$fleet.nyrs<-renderUI({
-    numericInput("fleetyrs","# of years",value=get(input$fleet)@nyears,min=1, max=1000, step=1)
+    numericInput("fleetyrs","# of years before MP engaged",value=get(input$fleet)@nyears,min=1, max=1000, step=1)
     })
   })
   observeEvent(input$fleet, {output$fleet.spattarg<-renderUI({
@@ -765,7 +765,7 @@ shinyServer(function(input, output,session) {
     })
   })
   observeEvent(input$obs, {output$Obs.Cbiascv<-renderUI({
-    numericInput("Cbiascv","Annual catch bias",value=get(input$obs)@Cbiascv,min=0, max=5, step=0.01)
+    numericInput("Cbiascv","Annual catch bias",value=get(input$obs)@Cbiascv,min=-5, max=5, step=0.01)
     })
   })
   observeEvent(input$obs, {output$Obs.CAA_nsamp<-renderUI({
