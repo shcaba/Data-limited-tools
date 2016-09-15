@@ -6,12 +6,16 @@
 *Make meaningful methods names
 *Add age and lengths comps to the data tab
 *Add stock inputs that would use the DLMobject inputs
+*Add run indicator for the TAC tab
+*Add composite TAC values download
+*Add list of MPs even when dlm object is not there
+*Magic button for deterministic run: Make SDs 0, make LH values same for both slider values
 
 #Shiny Natural mortality tool
 *Add the equations as a pop-up
 *Add references
 
-#Improvements to DLMtool
+#Improvements to DLMtool R package
 age-specific M
 coorelations in paramter draws
 
