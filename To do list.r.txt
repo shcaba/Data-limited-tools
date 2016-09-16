@@ -12,6 +12,8 @@
 *Magic button for deterministic run: Make SDs 0, make LH values same for both slider values. Work with Chantel to make sure fleet and 
 *VOI plot: # of MPs to plot-- is this redundant to the "Choose methods for the Kobe, projection and VOI plots"
 *When custsomizing your stock, fleet and Obs inputs, have a choice to save them.
+*Add inputs in the MP methods for TAC and MSE sections 
+*Check sensitivity plots for extension of the range of values.
 
 #Shiny Natural mortality tool
 *Add the equations as a pop-up
@@ -20,9 +22,13 @@
 #Improvements to DLMtool R package
 age-specific M
 coorelations in paramter draws
+Ask whether year-specific M is doable in DLMtool
 
 MSE improvements: 
 Need user-specified reference points.
 Better transparency of reference points.
 Add crustsacean example for stock OM
 Make a deterministic run easy to do
+
+
+What is getr()?

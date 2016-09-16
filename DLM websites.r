@@ -3,6 +3,7 @@ DLMtool website: http://www.datalimitedtoolkit.org/
 Shiny DLM app weblink: https://shcaba.shinyapps.io/Shiny_DLMtool/
 Jason Cope's GitHub: https://github.com/shcaba
 NOAA Fisheries toolbox: http://nft.nefsc.noaa.gov/index.html
+FLR (library in R): http://www.flr-project.org/
 
 ICES websites
 ICES stock assessment website: https://www.stockassessment.org/login.php
