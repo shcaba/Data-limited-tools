@@ -8,7 +8,7 @@ require(DLMtool)
 source('load_DLM.r',local = FALSE)
 
 shinyUI(fluidPage(
-  titlePanel("Applying the DLMtool"),
+  titlePanel("Welcome to the DLMtool GUI"),
   sidebarLayout(
    sidebarPanel(
     fileInput('file1', 'Choose DLM input file',
@@ -23,7 +23,13 @@ shinyUI(fluidPage(
     ),
     conditionalPanel(
       condition="input.conditionedPanels==1",
-      p("Click", tags$a(href="javascript:window.open('DLMobject_slots.html', '_blank','width=600,height=400')", "here"), "for a desciption of the DLM object inputs.")
+      p("Click", tags$a(href="javascript:window.open('DLMobject_slots.html', '_blank','width=600,height=400')", "here"), "for a desciption of the DLM object inputs."),
+      br(),
+      h4("Information on the DLMtool"),
+      p("The DLMtool library for R was created by Dr. Tom Carruthers with funding provided by the National Resources Defense Council. More information can be found at", tags$a(href="http://www.datalimitedtoolkit.org/","http://www.datalimitedtoolkit.org/",target="_blank")),
+      br(),
+      h4("Information on the DLMtool Shiny web application"),
+      p("The Shiny app for the DLMtool was developed by Dr. Jason Cope of NOAA Fisheries (jason.cope@noaa.gov). All comments on the app's functionality and requests for features should be directed to him. The sources code for the app can be found ", tags$a(href="https://github.com/shcaba/Data-limited-tools/tree/master/Shiny_DLMtool", "here",target="_blank") )
     ),
     conditionalPanel(
     condition="input.conditionedPanels==3",wellPanel(uiOutput("choicelist"),
