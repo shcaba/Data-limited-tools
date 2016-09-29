@@ -2,6 +2,8 @@ name: Shiny_DLMtool
 account: shcaba
 server: shinyapps.io
 appId: 126769
-bundleId: 563093
+bundleId: 563183
 url: https://shcaba.shinyapps.io/Shiny_DLMtool/
-when: 1474401254.95233
+when: 1474407615.32871
+asMultiple: FALSE
+asStatic: FALSE
