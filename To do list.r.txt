@@ -18,7 +18,8 @@
 
 #Shiny Natural mortality tool
 *Add the equations as a pop-up
-*Add references
+*Report age-specific M for those applicable methods
+*Fix M composite so truncates above M
 
 #Improvements to DLMtool R package
 coorelations in paramter draws

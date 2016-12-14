@@ -6,6 +6,9 @@ shinyUI(
     h5(p(em("This tool employs various empirical estimators of natural mortality."))),
     h5(p(em("As the user enters values for the below input parameters,"))), 
     h5(p(em("estimates will be displayed in the main panel."))),
+    br(),
+    h4(p("References for each method can be found",tags$a(href="javascript:window.open('References_M.html', '_blank','width=600,height=400')", "here"))),
+    
     headerPanel("Input parameters"),
     sidebarLayout(
         sidebarPanel
