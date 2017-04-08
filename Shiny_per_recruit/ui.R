@@ -15,13 +15,28 @@ shinyUI(fluidPage(
     tabPanel("Growth",
              sidebarLayout(
                sidebarPanel(
-                 numericInput("amax", "Age classes:", value=20), 
-                 numericInput("Linf", withMathJax("$$L_\\infty:$$"), value=100),
-                 numericInput("k", "k:", value = 0.1),
+                 h3("Biological parameters"),
+                 numericInput("amax", "Age classes:", value=NA), 
+                 numericInput("M", "Natural Mortality",value=NA),
+                 numericInput("fish", "Fishing Mortality", value=NA),
+                 numericInput("Linf", withMathJax("$$L_\\infty:$$"), value=NA),
+                 numericInput("k", "k:", value = NA),
                  numericInput("t0", withMathJax("$$t_0:$$"), value = 0),
                  numericInput("b", "Weight-Length exponent:", value = 3),
-                 numericInput("d", "Allometric scaling:",value = 0.0067)
-                 ),
+                 numericInput("d", "Allometric scaling:",value = NA),
+                 numericInput("d", "Length at 50% maturity:",value = NA),
+                 numericInput("d", "Length at 95% maturity:",value = NA),
+                 h3("Selectivity parameters"),
+                 h4("Knife-edged"),
+                 numericInput("Knife_selex", "Length at 1st full selectivity",  value=NA),
+                 h4("Logistic"),
+                 numericInput("Logselex_50%", "Length at 50% selectivity",  value=NA),
+                 numericInput("Logselex_95%", "Length at 90% selectivity",value=NA),
+                 h4("Dome-shaped"),
+                 numericInput("LV_dome", "Length less than full selectivity",  value=NA),
+                 numericInput("SelFull_dome", "Length at full selectivity",  value=NA),
+                 numericInput("RV_dome", "Length greater than full selectivity",value=NA)
+               ),
                 mainPanel(
                   column(5, plotOutput("VBGFplot")),
                   column(5, plotOutput("WeightAtAge"))
